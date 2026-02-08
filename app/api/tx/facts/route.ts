@@ -29,7 +29,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ facts: cached, requestId, cached: true });
   }
 
-  const facts = await getFacts(parsed.data);
-  await cacheSet(key, facts, TTL);
-  return NextResponse.json({ facts, requestId, cached: false });
+  try {
+    const facts = await getFacts(parsed.data);
+    await cacheSet(key, facts, TTL);
+    return NextResponse.json({ facts, requestId, cached: false });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("WrongSize") || message.includes("Invalid param")) {
+      return NextResponse.json({ error: "invalid signature", requestId }, { status: 400 });
+    }
+    return NextResponse.json({ error: "rpc_unavailable", requestId }, { status: 502 });
+  }
 }
