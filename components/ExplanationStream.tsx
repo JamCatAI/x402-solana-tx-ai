@@ -10,11 +10,13 @@ export default function ExplanationStream({ signature, initialFacts }: { signatu
   const [summaryStream, setSummaryStream] = useState("");
   const [finalResult, setFinalResult] = useState<TxAIResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
     const run = async () => {
       setLoading(true);
+      setError(null);
       setSummaryStream("");
       setFinalResult(null);
 
@@ -25,8 +27,19 @@ export default function ExplanationStream({ signature, initialFacts }: { signatu
         signal: controller.signal
       });
 
+      if (!res.ok) {
+        setError(`Streaming failed (${res.status}).`);
+        setLoading(false);
+        return;
+      }
+
       const reader = res.body?.getReader();
-      if (!reader) return;
+      if (!reader) {
+        setError("No response stream available.");
+        setLoading(false);
+        return;
+      }
+
       const decoder = new TextDecoder();
       let buffer = "";
 
@@ -36,6 +49,7 @@ export default function ExplanationStream({ signature, initialFacts }: { signatu
         buffer += decoder.decode(value, { stream: true });
         const events = buffer.split("\n\n");
         buffer = events.pop() || "";
+
         for (const event of events) {
           const line = event.split("\n").find((l) => l.startsWith("data:"));
           if (!line) continue;
@@ -48,26 +62,58 @@ export default function ExplanationStream({ signature, initialFacts }: { signatu
       setLoading(false);
     };
 
-    run().catch(() => setLoading(false));
+    run().catch(() => {
+      setError("Unable to stream explanation.");
+      setLoading(false);
+    });
+
     return () => controller.abort();
   }, [signature, mode]);
 
-  const exportPayload = useMemo(() => finalResult || { facts: initialFacts, summary: summaryStream }, [finalResult, initialFacts, summaryStream]);
+  const exportPayload = useMemo(
+    () => finalResult || { facts: initialFacts, summary: summaryStream },
+    [finalResult, initialFacts, summaryStream]
+  );
 
   return (
-    <section className="rounded-xl border border-black/10 bg-white p-5 shadow-sm">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="font-display text-2xl font-bold">Explanation</h2>
-        <div className="flex items-center gap-2">
-          <select className="rounded border border-black/20 px-2 py-1 text-sm" value={mode} onChange={(e) => setMode(e.target.value as "basic" | "tax") }>
-            <option value="basic">Basic</option>
-            <option value="tax">Tax</option>
-          </select>
+    <section className="fin-panel animate-rise p-6" style={{ animationDelay: "100ms" }}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-semibold">AI Explanation</h2>
+          <div className="mt-2 flex items-center gap-2 text-xs text-slate-300">
+            {loading ? <span className="stream-dot" /> : null}
+            <span>{loading ? "Streaming" : "Idle"}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 rounded-xl border border-cyan-200/20 bg-slate-950/35 p-1">
+          <button
+            className={`rounded-lg px-3 py-1 text-xs font-semibold ${mode === "basic" ? "bg-cyan-300/25 text-cyan-100" : "text-slate-300"}`}
+            onClick={() => setMode("basic")}
+            type="button"
+          >
+            Basic
+          </button>
+          <button
+            className={`rounded-lg px-3 py-1 text-xs font-semibold ${mode === "tax" ? "bg-cyan-300/25 text-cyan-100" : "text-slate-300"}`}
+            onClick={() => setMode("tax")}
+            type="button"
+          >
+            Tax
+          </button>
           <CopyButton text={JSON.stringify(exportPayload, null, 2)} />
         </div>
       </div>
 
-      <p className="mt-4 whitespace-pre-wrap text-sm leading-6">{summaryStream || (loading ? "Streaming..." : "No streamed output yet")}</p>
+      <div className="mt-5 rounded-xl border border-cyan-200/15 bg-slate-950/35 p-4">
+        {error ? <p className="text-sm text-rose-200">{error}</p> : null}
+        {!error ? (
+          <p className="whitespace-pre-wrap text-sm leading-7 text-slate-100">
+            {summaryStream || (loading ? "Waiting for streamed tokens..." : "No explanation streamed yet.")}
+          </p>
+        ) : null}
+      </div>
+
       {finalResult ? (
         <div className="mt-5">
           <JsonViewer value={finalResult} />

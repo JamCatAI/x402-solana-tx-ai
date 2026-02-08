@@ -3,11 +3,138 @@
 @tailwind utilities;
 
 :root {
-  --bg: #f7f4ec;
-  --fg: #0e1d24;
+  --bg: #031223;
+  --bg-soft: #0d2740;
+  --bg-panel: #0d1f34cc;
+  --line: #75b6ff2b;
+  --text: #e8f3ff;
+  --muted: #9ab4cf;
+  --accent: #2ad6c9;
+  --accent-2: #4d9dff;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: radial-gradient(circle at top left, #ffffff, var(--bg));
-  color: var(--fg);
+  font-family: var(--font-body), sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(85rem 42rem at -10% -30%, #1e3f6d 0%, transparent 62%),
+    radial-gradient(72rem 36rem at 120% -10%, #163764 0%, transparent 58%),
+    linear-gradient(180deg, #031223 0%, #04182b 40%, #02111f 100%);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: -0.015em;
+}
+
+.fin-shell {
+  position: relative;
+}
+
+.fin-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(to right, #84c5ff10 1px, transparent 1px), linear-gradient(to bottom, #84c5ff0f 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at 50% 20%, #000 35%, transparent 100%);
+}
+
+.fin-panel {
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, #122b46cf, #0a1a2bc7);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  box-shadow: 0 10px 44px #020c174a;
+}
+
+.fin-chip {
+  border: 1px solid #9fd2ff2e;
+  background: #102740d4;
+  color: #d8ebff;
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.fin-kpi {
+  border: 1px solid #72b4ff2b;
+  border-radius: 0.8rem;
+  background: linear-gradient(180deg, #102840d4, #0c2036cc);
+  padding: 0.9rem;
+}
+
+.btn-primary {
+  border-radius: 0.75rem;
+  padding: 0.62rem 1rem;
+  font-weight: 600;
+  color: #032338;
+  background: linear-gradient(140deg, var(--accent), #6bf0ca);
+  border: 1px solid #8ff4dd;
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  border-radius: 0.75rem;
+  padding: 0.62rem 1rem;
+  font-weight: 600;
+  color: #d9ecff;
+  background: #0d2740cf;
+  border: 1px solid #89c3ff40;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.btn-ghost:hover {
+  background: #133355;
+  transform: translateY(-1px);
+}
+
+.stream-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #3be7ba;
+  box-shadow: 0 0 0 0 #3be7ba;
+  animation: pulse 1.3s infinite;
+}
+
+.animate-rise {
+  animation: rise 480ms ease both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 #3be7ba70;
+  }
+  70% {
+    box-shadow: 0 0 0 12px #3be7ba00;
+  }
+  100% {
+    box-shadow: 0 0 0 0 #3be7ba00;
+  }
 }

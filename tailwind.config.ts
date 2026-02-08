@@ -8,15 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        ink: "#0e1d24",
-        paper: "#f7f4ec",
-        accent: "#0c8f7b",
-        danger: "#bc3f3f"
-      },
       fontFamily: {
-        display: ["Space Grotesk", "sans-serif"],
-        body: ["IBM Plex Sans", "sans-serif"]
+        display: ["var(--font-display)", "sans-serif"],
+        body: ["var(--font-body)", "sans-serif"]
       }
     }
   },

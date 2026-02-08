@@ -7,7 +7,7 @@ export default function CopyButton({ text }: { text: string }) {
 
   return (
     <button
-      className="rounded border border-black/20 px-3 py-1 text-sm"
+      className="rounded-lg border border-cyan-200/30 bg-slate-900/60 px-3 py-1 text-xs font-semibold text-cyan-100"
       onClick={async () => {
         await navigator.clipboard.writeText(text);
         setCopied(true);
