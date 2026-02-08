@@ -1,3 +1,5 @@
+<img width="1662" height="833" alt="image" src="https://github.com/user-attachments/assets/2f8b0cab-f71e-4748-873e-d414c97619db" />
+
 # x402-solana-tx-ai
 
 Production-ready Next.js app for deterministic Solana transaction facts + AI explanation/classification, monetized per request with HTTP 402 payment flow.
